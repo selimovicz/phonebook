@@ -45,12 +45,13 @@ module.exports = function(app) {
 	});
 
 	// create dummy user
+	// curl -i -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8080/api/setup
 	apiRoutes.get('/setup', function(req, res) {
 
 	  // create a sample user
 	  var user = new User({ 
-	    email: 'test@test.com', 
-	    password: 'test123'
+	    email: 'zeid@gmail.com', 
+	    password: 'zeid'
 	  });
 
 	  // save the sample user
@@ -92,7 +93,6 @@ module.exports = function(app) {
 	  }
 	});
 
-	// api ---------------------------------------------------------------------
 	// get all books
 	apiRoutes.get('/books', function(req, res) {
 

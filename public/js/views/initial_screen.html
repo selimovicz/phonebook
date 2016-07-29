@@ -11,7 +11,7 @@
     	<div class="row phone-header">
     		<div class="col-md-4 sort">
     			<span class="pull-left">Sort by:</span>
-    			<select class="form-control pull-left" id="salesCurrency" ng-model="books.sortBy">
+    			<select class="form-control pull-left" id="salesCurrency" ng-model="books.sortBy" ng-change="books.sort()">
         			<option value="firstName">First Name</option>
         			<option value="lastName">Last Name</option>
         			<option value="phoneNumber">Phone Number</option>

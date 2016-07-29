@@ -18,7 +18,8 @@ App.controller('MasterController', [
       	sortBy: 'firstName',
       	createNew: function(){},
       	editBookEntry: function(bookId){},
-      	deleteBookEntry: function(bookId){}
+      	deleteBookEntry: function(bookId){},
+        sort: function(){}
       };
 
       $scope.closeModalPromise = function(modalName, book) {
@@ -102,6 +103,12 @@ App.controller('MasterController', [
      	$scope.books.closeDialog = function(book){
      		ngDialog.close();
      	};
+
+      $scope.books.sort = function(){
+        BooksService.getBooks().then(function(response){
+          $scope.books.all = response.data;
+        });
+      };
 
      	$scope.books.deleteBookEntry = function(book){
      		if(book.confirmDelete){

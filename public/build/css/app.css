@@ -11582,14 +11582,12 @@ a {
   outline: none;
   border-radius: 2px;
   border: 1px solid #4E5D6C;
-  background-color: #fff;
-  color: #000;
+  background-color: #4E5D6C;
+  color: #fff;
 }
 #phonebook .phone-header button:hover,
 #phonebook .phone-header button.modal-opened {
-  background-color: #4E5D6C;
-  transition: background-color 0.5s ease;
-  color: #fff;
+  opacity: 0.8;
 }
 #phonebook .phone-header button i {
   font-weight: 300;
@@ -11603,6 +11601,8 @@ a {
   margin-left: 19px;
   font-size: 12px;
   height: 28px;
+  outline: none !important;
+  box-shadow: none !important;
   border: 1px solid #4E5D6C;
 }
 #phonebook .phone-table {
@@ -11642,7 +11642,6 @@ a {
   border-bottom: 1px solid #bbb3b3;
   color: #484848;
   box-shadow: none;
-  outline: none;
   margin-top: 3px;
   font-size: 14px;
   outline: none !important;
