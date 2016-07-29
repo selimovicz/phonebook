@@ -1,0 +1,35 @@
+<div class="initial-screen">
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <h4>Login</h4>
+        </div>
+    </div>
+
+    <div class="container" id="phonebook">
+
+
+    	<div class="row phone-table">
+    		<div class="col-md-12">
+    			<div class="form-group" ng-class="{'has-error': false}">
+                    <div class="row field">
+                        <label class="col-md-4 control-label"> Email</label>
+                        <div class="col-md-4">
+                            <input class="form-control animated" autofocus ng-model="email" placeholder="Email"/>
+                        </div>
+                    </div>
+
+                    <div class="row field">
+                        <label class="col-md-4 control-label"> Password</label>
+                        <div class="col-md-4">
+                            <input class="form-control animated" ng-model="password" placeholder="Password"/>
+                            <br/><br/>
+                            <button type="button" class="btn btn-default login pull-right" ng-click="doLogin()" ng-disabled="!(email && password)"> Login</button>
+                        </div>
+                    </div>
+
+                </div>
+    		</div>
+    	</div>
+
+    </div>
+</div>

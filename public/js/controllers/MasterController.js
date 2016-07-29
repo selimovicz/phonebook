@@ -13,25 +13,38 @@ App.controller('MasterController', [
 
         $scope.books = {
         	all : getBooks.data,
+        	sortBy: 'firstName',
         	createNew: function(){},
         	editBookEntry: function(bookId){},
         	deleteBookEntry: function(bookId){}
         };
 
-        $scope.closeModalPromise = function(modalName) {
+        $scope.closeModalPromise = function(modalName, book) {
 	        $scope[modalName].closePromise.then(data => {
 	          $scope.books.modalTriggered = false;
+
+	          // restore old value if cancel edit
+	          if(book && $scope.modalData.editing && !$scope.modalData.entrySaved){
+	          	book = $scope.oldBookValue;
+	          }
 	          $scope.modalData = {};
 	        });
 	    };
+
+	    $scope.$watch('books.sortBy', function(){
+	    	$scope.books.sorting = true;
+	    	$timeout(function(){
+	    		$scope.books.sorting = false;
+	    	}, 500);
+	    });
 
 	    $scope.books.editBookEntry = function(book){
 	    	// if modal alaready triggered and 
         	if($scope.books.modalTriggered){
 
         		var requestBody = setRequestBody();
-        		BooksService.updatePhoneBook().then(function(response){
-
+        		BooksService.updatePhoneBook($scope.modalData).then(function(response){
+        			$scope.modalData.entrySaved = true;
         			onSuccessEntry(book);
         		});
 
@@ -39,12 +52,14 @@ App.controller('MasterController', [
         		// trigger ngDialog
         		$scope.books.modalTriggered = true;
         		$scope.modalData = book;
+        		$scope.oldBookValue = angular.copy(book);
+        		$scope.modalData.editing = true;
         		$scope.modalData.modalTitle = "Edit Phonebook entry";
         		$scope.createNewModal = ngDialog.open({ template: 'js/views/partials/_book_modal.html', scope: $scope });
 
 		        /* fetch close modal event and trigger 
 		        propper functoion to clear up data */
-		        $scope.closeModalPromise('createNewModal');
+		        $scope.closeModalPromise('createNewModal', book);
 
         	}
 	    };
@@ -65,7 +80,6 @@ App.controller('MasterController', [
 
 	        	});
 
-
         	}else{
 
         		// trigger ngDialog
@@ -83,7 +97,7 @@ App.controller('MasterController', [
         	}
        	};
 
-       	$scope.books.closeDialog = function(){
+       	$scope.books.closeDialog = function(book){
        		ngDialog.close();
        	};
 
@@ -112,7 +126,7 @@ App.controller('MasterController', [
 	    function onSuccessEntry(book){
 			$timeout(function(){
     			$scope.books.closeDialog();
-    			if(book.newlyAdded) $scope.books.all.push(book);
+    			if(book.newlyAdded) { $scope.books.all.push(book); }else { book.edited = true; }
     		}, 2000);
 	    }
 

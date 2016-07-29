@@ -11568,6 +11568,10 @@ body {
   font-family: 'Open Sans', sans-serif;
   font-weight: 300;
 }
+button,
+a {
+  outline: none;
+}
 #phonebook {
   padding-top: 80px;
 }
@@ -11591,6 +11595,16 @@ body {
   font-weight: 300;
   margin-right: 10px;
 }
+#phonebook .phone-header .sort span {
+  margin-top: 3px;
+}
+#phonebook .phone-header .sort select {
+  width: 50%;
+  margin-left: 19px;
+  font-size: 12px;
+  height: 28px;
+  border: 1px solid #4E5D6C;
+}
 #phonebook .phone-table {
   margin-top: 30px;
 }
@@ -11604,6 +11618,49 @@ body {
   color: #fff;
   background: #B20000;
   border-radius: 2px;
+}
+#phonebook .phone-table table.sorting {
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+}
+.field {
+  margin-top: 20px;
+}
+.field label {
+  font-weight: 400;
+  text-align: right;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.field input {
+  padding: 0 10px;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid #bbb3b3;
+  color: #484848;
+  box-shadow: none;
+  outline: none;
+  margin-top: 3px;
+  font-size: 14px;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.field .login {
+  padding: 6px 18px;
+  font-size: 11px;
+  font-weight: 300;
+  outline: none;
+  border-radius: 2px;
+  background-color: #4E5D6C;
+  border-color: #4E5D6C;
+  color: #fff;
+}
+.field .login:hover {
+  background: #626c77;
+  border-color: #4E5D6C;
 }
 .ngdialog.ngdialog-theme-default {
   top: -50px;
@@ -11623,26 +11680,6 @@ body {
 }
 .ngdialog.ngdialog-theme-default .ngdialog-content .modal-body {
   padding-bottom: 0px;
-}
-.ngdialog.ngdialog-theme-default .ngdialog-content .modal-body .field {
-  margin-top: 20px;
-}
-.ngdialog.ngdialog-theme-default .ngdialog-content .modal-body .field label {
-  font-weight: 400;
-  text-align: right;
-  margin-top: 10px;
-  font-size: 14px;
-}
-.ngdialog.ngdialog-theme-default .ngdialog-content .modal-body .field input {
-  padding: 0 10px;
-  border: none;
-  border-radius: 0;
-  border-bottom: 1px solid #bbb3b3;
-  color: #484848;
-  box-shadow: none;
-  outline: none;
-  margin-top: 3px;
-  font-size: 14px;
 }
 .ngdialog.ngdialog-theme-default .ngdialog-content .modal-footer {
   padding-top: 20px;

@@ -1,5 +1,7 @@
 var Book = require('./models/book');
+var User = require('./models/user'); 
 
+var jwt    = require('jsonwebtoken');
 module.exports = function(app) {
 
 	// api ---------------------------------------------------------------------
@@ -56,6 +58,22 @@ module.exports = function(app) {
 
 	});
 
+	// update book
+	app.put('/api/book/:book_id', function(req, res) {
+	    Book.update({ _id: req.params.book_id }, req.body, function (err, books) {
+	        if (err){
+				res.send(err);
+			}else{
+				// get and return all the books after you create another
+				Book.find(function(err, books) {
+					if (err)
+						res.send(err)
+					res.json(books);
+				});
+			}
+	    });
+	});
+
 	// delete book
 	app.delete('/api/book/:book_id', function(req, res) {
 		Book.remove({
@@ -72,6 +90,67 @@ module.exports = function(app) {
 			});
 		});
 	});
+
+
+	// user --------------------------------------------------------------------
+
+	// create dummy user
+	app.get('/api/setup', function(req, res) {
+
+	  // create a sample user
+	  var user = new User({ 
+	    email: 'test@test.com', 
+	    password: 'test123'
+	  });
+
+	  // save the sample user
+	  user.save(function(err) {
+	    if (err) throw err;
+	    console.log('User saved successfully');
+	    res.json({ success: true });
+	  });
+
+	});
+
+	// route to authenticate a user (POST http://localhost:8080/api/authenticate)
+	app.post('/api/authenticate', function(req, res) {
+
+	  // find the user
+	  User.findOne({
+	    name: req.body.email
+	  }, function(err, user) {
+
+	    if (err) throw err;
+	    if (!user) {
+	      res.json({ success: false, message: 'Authentication failed. User not found.' });
+	    } else if (user) {
+	    	console.log(user);
+	      // check if password matches
+	      if (user.password != req.body.password) {
+	        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+	      } else {
+
+	        // if user is found and password is right
+	        // create a token
+	        var token = jwt.sign(user, app.get('superSecret'), {
+	          expiresInMinutes: 1440 // expires in 24 hours
+	        });
+
+	        // return the information including token as JSON
+	        res.json({
+	          success: true,
+	          message: 'Enjoy your token!',
+	          token: token
+	        });
+	      }   
+
+	    }
+
+	  });
+	});
+
+
+
 
 	// application -------------------------------------------------------------
 	app.get('*', function(req, res) {

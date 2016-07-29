@@ -31296,15 +31296,15 @@ var App = angular.module('App', [
         singleBook: '/book/'
     });
 /*global App: true, angular:true */
-App.controller('BooksController', [
+App.controller('LoginController', [
     '$scope',
     '$log',
     '$rootScope',
     '$stateParams',
-    'BooksService',
-    function($scope, $log, $rootScope, $stateParams, BooksService) {
+    'LoginService',
+    function($scope, $log, $rootScope, $stateParams, LoginService) {
         'use strict';
-        	
+        	console.log('---');
 
     }
 ]);
@@ -31323,25 +31323,38 @@ App.controller('MasterController', [
 
         $scope.books = {
         	all : getBooks.data,
+        	sortBy: 'firstName',
         	createNew: function(){},
         	editBookEntry: function(bookId){},
         	deleteBookEntry: function(bookId){}
         };
 
-        $scope.closeModalPromise = function(modalName) {
+        $scope.closeModalPromise = function(modalName, book) {
 	        $scope[modalName].closePromise.then(data => {
 	          $scope.books.modalTriggered = false;
+
+	          // restore old value if cancel edit
+	          if(book && $scope.modalData.editing && !$scope.modalData.entrySaved){
+	          	book = $scope.oldBookValue;
+	          }
 	          $scope.modalData = {};
 	        });
 	    };
+
+	    $scope.$watch('books.sortBy', function(){
+	    	$scope.books.sorting = true;
+	    	$timeout(function(){
+	    		$scope.books.sorting = false;
+	    	}, 500);
+	    });
 
 	    $scope.books.editBookEntry = function(book){
 	    	// if modal alaready triggered and 
         	if($scope.books.modalTriggered){
 
         		var requestBody = setRequestBody();
-        		BooksService.updatePhoneBook().then(function(response){
-
+        		BooksService.updatePhoneBook($scope.modalData).then(function(response){
+        			$scope.modalData.entrySaved = true;
         			onSuccessEntry(book);
         		});
 
@@ -31349,12 +31362,14 @@ App.controller('MasterController', [
         		// trigger ngDialog
         		$scope.books.modalTriggered = true;
         		$scope.modalData = book;
+        		$scope.oldBookValue = angular.copy(book);
+        		$scope.modalData.editing = true;
         		$scope.modalData.modalTitle = "Edit Phonebook entry";
         		$scope.createNewModal = ngDialog.open({ template: 'js/views/partials/_book_modal.html', scope: $scope });
 
 		        /* fetch close modal event and trigger 
 		        propper functoion to clear up data */
-		        $scope.closeModalPromise('createNewModal');
+		        $scope.closeModalPromise('createNewModal', book);
 
         	}
 	    };
@@ -31375,7 +31390,6 @@ App.controller('MasterController', [
 
 	        	});
 
-
         	}else{
 
         		// trigger ngDialog
@@ -31393,7 +31407,7 @@ App.controller('MasterController', [
         	}
        	};
 
-       	$scope.books.closeDialog = function(){
+       	$scope.books.closeDialog = function(book){
        		ngDialog.close();
        	};
 
@@ -31422,7 +31436,7 @@ App.controller('MasterController', [
 	    function onSuccessEntry(book){
 			$timeout(function(){
     			$scope.books.closeDialog();
-    			if(book.newlyAdded) $scope.books.all.push(book);
+    			if(book.newlyAdded) { $scope.books.all.push(book); }else { book.edited = true; }
     		}, 2000);
 	    }
 
@@ -31440,8 +31454,13 @@ App
             $urlRouterProvider.otherwise("/");
 
             $stateProvider
-                .state('books', {
+                .state('login', {
                     url: '/',
+                    templateUrl: 'js/views/login.html',
+                    controller: 'LoginController'
+                })
+                .state('books', {
+                    url: '/books',
                     templateUrl: 'js/views/initial_screen.html',
                     controller: 'MasterController',
                     resolve: {
@@ -31490,9 +31509,19 @@ App.service('BooksService', ['$http', '$q', '$location', 'conf', function($http,
     };
 
     books.updatePhoneBook = function(bookEntry){
-        return $http.post(conf.apiRoot + conf.browseBooks, newBookEntry);
+        return $http.put(conf.apiRoot + conf.singleBook + bookEntry._id, bookEntry);
     };
 
 
     return books;
+}]);
+/*global angular:true, is:true, console: true */
+App.service('LoginService', ['$http', '$q', '$location', 'conf', function($http, $q, $location, conf) {
+    'use strict';
+
+    var login = {};
+
+    
+
+    return login;
 }]);

@@ -8,7 +8,7 @@
 
 		<div class="form-group" ng-class="{'has-error': false}">
 			<div class="row field">
-				<label class="col-md-4 control-label"> First Name</label>
+				<label class="col-md-4 control-label"> First Name *</label>
 				<div class="col-md-6">
 					<input class="form-control animated" autofocus ng-model="modalData.firstName" placeholder="First Name"/>
 				</div>
@@ -22,7 +22,7 @@
 			</div>
 
 			<div class="row field">
-				<label class="col-md-4 control-label"> Phone Number</label>
+				<label class="col-md-4 control-label"> Phone Number *</label>
 				<div class="col-md-6">
 					<input class="form-control animated" ng-model="modalData.phoneNumber" placeholder="Phone Number"/>
 				</div>
@@ -32,7 +32,7 @@
 </div>
 
 <div class="modal-footer">
-	<button type="button" class="btn btn-default confirm-button" ng-if="modalData.newEntry" ng-click="books.createNew()" ng-disabled="modalData.entrySaved"> {{ modalData.entrySaved ? 'Saved' : 'Save entry'}}</button>
-	<button type="button" class="btn btn-default confirm-button" ng-if="!modalData.newEntry" ng-click="books.editBookEntry(modalData._id)" ng-disabled="modalData.entrySaved"> {{ modalData.entrySaved ? 'Saved' : 'Save entry'}}</button>
+	<button type="button" class="btn btn-default confirm-button action-button" ng-if="!modalData.editing" ng-click="books.createNew()" ng-disabled="modalData.entrySaved || !(modalData.firstName && modalData.phoneNumber)"> {{ modalData.entrySaved ? 'Saved' : 'Save entry'}}</button>
+	<button type="button" class="btn btn-default confirm-button action-button" ng-if="modalData.editing" ng-click="books.editBookEntry(modalData)" ng-disabled="modalData.entrySaved"> {{ modalData.entrySaved ? 'Saved' : 'Save entry'}}</button>
 	<button type="button" class="btn btn-default" ng-click="books.closeDialog()">Cancel</button></button>
 </div>

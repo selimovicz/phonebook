@@ -22,7 +22,7 @@ App.service('BooksService', ['$http', '$q', '$location', 'conf', function($http,
     };
 
     books.updatePhoneBook = function(bookEntry){
-        return $http.post(conf.apiRoot + conf.browseBooks, newBookEntry);
+        return $http.put(conf.apiRoot + conf.singleBook + bookEntry._id, bookEntry);
     };
 
 

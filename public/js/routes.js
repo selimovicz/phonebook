@@ -8,8 +8,13 @@ App
             $urlRouterProvider.otherwise("/");
 
             $stateProvider
-                .state('books', {
+                .state('login', {
                     url: '/',
+                    templateUrl: 'js/views/login.html',
+                    controller: 'LoginController'
+                })
+                .state('books', {
+                    url: '/books',
                     templateUrl: 'js/views/initial_screen.html',
                     controller: 'MasterController',
                     resolve: {

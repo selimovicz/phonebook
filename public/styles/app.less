@@ -12,7 +12,9 @@ body {
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
 }
-
+button, a {
+    outline: none;
+}
 #phonebook {
     padding-top: 80px;
     .phone-header{
@@ -35,6 +37,18 @@ body {
                 margin-right: 10px;
             }
         }
+        .sort{
+            span{
+                margin-top: 3px;
+            }
+            select{
+                width: 50%;
+                margin-left: 19px;
+                font-size: 12px;
+                height: 28px;
+                border: 1px solid #4E5D6C;
+            }
+        }
     }
     .phone-table{
         margin-top: 30px;
@@ -51,10 +65,52 @@ body {
                     border-radius: 2px;
                 }
             }
+            &.sorting {
+                -webkit-filter: blur(5px);
+                -moz-filter: blur(5px);
+                -o-filter: blur(5px);
+                -ms-filter: blur(5px);
+                filter: blur(5px);
+            }
         }
     }
 }
-
+.field{
+    margin-top: 20px;
+    label{
+        font-weight: 400;
+        text-align: right;
+        margin-top: 10px;
+        font-size: 14px
+    }
+    input{
+        padding: 0 10px;
+        border: none;
+        border-radius: 0;
+        border-bottom: 1px solid #bbb3b3;
+        color: #484848;
+        box-shadow: none;
+        outline: none;
+        margin-top: 3px;
+        font-size: 14px;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    .login{
+        padding: 6px 18px;
+        font-size: 11px;
+        font-weight: 300;
+        outline: none;
+        border-radius: 2px;
+        background-color: #4E5D6C;
+        border-color: #4E5D6C;
+        color: #fff;
+        &:hover{
+            background: #626c77;
+            border-color: #4E5D6C;
+        }
+    }
+}
 .ngdialog.ngdialog-theme-default{
     top: -50px;
     .ngdialog-content{
@@ -71,26 +127,6 @@ body {
         }
         .modal-body{
             padding-bottom: 0px;
-            .field{
-                margin-top: 20px;
-                label{
-                    font-weight: 400;
-                    text-align: right;
-                    margin-top: 10px;
-                    font-size: 14px
-                }
-                input{
-                    padding: 0 10px;
-                    border: none;
-                    border-radius: 0;
-                    border-bottom: 1px solid #bbb3b3;
-                    color: #484848;
-                    box-shadow: none;
-                    outline: none;
-                    margin-top: 3px;
-                    font-size: 14px;
-                }
-            }
         }
         .modal-footer{
             padding-top: 20px;

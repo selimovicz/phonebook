@@ -8,7 +8,14 @@
     <div class="container" id="phonebook">
 
     	<div class="row phone-header">
-    		<div class="col-md-4"></div>
+    		<div class="col-md-4 sort">
+    			<span class="pull-left">Sort by:</span>
+    			<select class="form-control pull-left" id="salesCurrency" ng-model="books.sortBy">
+        			<option value="firstName">First Name</option>
+        			<option value="lastName">Last Name</option>
+        			<option value="phoneNumber">Phone Number</option>
+				</select>
+    		</div>
     		<div class="col-md-4">
     			<button ng-click="books.createNew()" class="btn btn-primary" ng-class="{'modal-opened' : books.modalTriggered}"><i class="fa fa-plus" aria-hidden="true"></i> New phonebook entry</button>
     		</div>
@@ -16,7 +23,7 @@
 
     	<div class="row phone-table">
     		<div class="col-md-12">
-    			<table class="table table-hover">
+    			<table class="table table-hover" ng-class="{'sorting' : books.sorting}">
     				<tr>
     					<th>First Name</th>
 	    				<th>Last Name</th>
@@ -25,7 +32,7 @@
 	    				<th>Delete</th>
     				</tr>
 
-    				<tr class="animated" ng-repeat="book in books.all" ng-class="{'fadeOutLeft' : book.confirmedDelete, 'fadeInLeft': book.newlyAdded}">
+    				<tr class="animated" ng-repeat="book in books.all | orderBy: books.sortBy track by $index" ng-class="{'fadeOutLeft' : book.confirmedDelete, 'fadeInLeft': book.newlyAdded, 'pulse' : book.edited}">
     					<td>{{book.firstName}}</td>
     					<td>{{book.lastName}}</td>
     					<td>{{book.phoneNumber}}</td>
