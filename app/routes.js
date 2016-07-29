@@ -18,11 +18,11 @@ module.exports = function(app) {
 
 	    if (err) throw err;
 	    if (!user) {
-	      res.json({ success: false, message: 'Authentication failed. User not found.' });
+	      res.status(401).send({ success: false, message: 'Authentication failed. User not found.', cause: 'email' });
 	    } else if (user) {
 	      // check if password matches
 	      if (user.password != req.body.password) {
-	        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+	        res.status(401).send({ success: false, message: 'Authentication failed. Wrong password.', cause: 'password'});
 	      } else {
 
 	        // if user is found and password is right
@@ -34,7 +34,7 @@ module.exports = function(app) {
 	        // return the information including token as JSON
 	        res.json({
 	          success: true,
-	          message: 'Enjoy your token!',
+	          message: 'Here is your token!',
 	          token: token
 	        });
 	      }   

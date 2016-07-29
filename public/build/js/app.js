@@ -31291,20 +31291,61 @@ var App = angular.module('App', [
         'ngDialog'
     ])
     .constant('conf', {
+    	notAuthenticated: 'auth-not-authenticated',
     	apiRoot: '/api',
+    	auth: '/authenticate',
         browseBooks: '/books',
         singleBook: '/book/'
-    });
+    })
+    // creating iterceptor to attach access token to api requests
+    .factory('BearerAuthInterceptor', function ($window, $q) {
+	    return {
+	        request: function(config) {
+	            config.headers = config.headers || {};
+	            if ($window.localStorage.getItem('tokenKey')) {
+	                config.headers['x-access-token'] = window.localStorage.getItem('tokenKey');
+	            }
+	            return config || $q.when(config);
+	        }
+	    };
+	}).config(function ($httpProvider) {
+	    $httpProvider.interceptors.push('BearerAuthInterceptor');
+	});
 /*global App: true, angular:true */
 App.controller('LoginController', [
     '$scope',
     '$log',
     '$rootScope',
+    '$state',
     '$stateParams',
     'LoginService',
-    function($scope, $log, $rootScope, $stateParams, LoginService) {
+    function($scope, $log, $rootScope, $state, $stateParams, LoginService) {
         'use strict';
-        	console.log('---');
+        
+        $scope.user = {};
+
+        $scope.doLogin = function(){
+
+        	// Email validity check
+	        var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	        if(!emailRegex.test($scope.user.email)) {
+	          $scope.error = { is : true, message: "Email is not valid.", cause: 'email' };
+	        }else{
+	        	LoginService.doLogin($scope.user).then(function(response){
+	        		$state.go('books');
+	        	}, function(error){
+	        		$scope.error = { is : true, message: error.message, cause: error.cause };
+	        	});
+	        }
+        };
+
+        if(LoginService.isAuthenticated) {
+        	$state.go('books');
+        }
+
+        $scope.clearError = function(){
+        	$scope.error = {};
+        };
 
     }
 ]);
@@ -31315,135 +31356,158 @@ App.controller('MasterController', [
     '$rootScope',
     '$stateParams',
     '$timeout',
+    '$state',
     'getBooks',
     'ngDialog',
     'BooksService',
-    function($scope, $log, $rootScope, $stateParams, $timeout, getBooks, ngDialog, BooksService) {
+    'LoginService',
+    function($scope, $log, $rootScope, $stateParams, $timeout, $state, getBooks, ngDialog, BooksService, LoginService) {
         'use strict';
 
-        $scope.books = {
-        	all : getBooks.data,
-        	sortBy: 'firstName',
-        	createNew: function(){},
-        	editBookEntry: function(bookId){},
-        	deleteBookEntry: function(bookId){}
-        };
+      $scope.books = {
+      	all : getBooks.data,
+      	sortBy: 'firstName',
+      	createNew: function(){},
+      	editBookEntry: function(bookId){},
+      	deleteBookEntry: function(bookId){}
+      };
 
-        $scope.closeModalPromise = function(modalName, book) {
-	        $scope[modalName].closePromise.then(data => {
-	          $scope.books.modalTriggered = false;
+      $scope.closeModalPromise = function(modalName, book) {
+        $scope[modalName].closePromise.then(data => {
+          $scope.books.modalTriggered = false;
 
-	          // restore old value if cancel edit
-	          if(book && $scope.modalData.editing && !$scope.modalData.entrySaved){
-	          	book = $scope.oldBookValue;
-	          }
-	          $scope.modalData = {};
-	        });
-	    };
+          // restore old value if cancel edit
+          if(book && $scope.modalData.editing && !$scope.modalData.entrySaved){
+          	book = $scope.oldBookValue;
+          }
+          $scope.modalData = {};
+        });
+      };
 
-	    $scope.$watch('books.sortBy', function(){
-	    	$scope.books.sorting = true;
-	    	$timeout(function(){
-	    		$scope.books.sorting = false;
-	    	}, 500);
-	    });
+      $scope.$watch('books.sortBy', function(){
+      	$scope.books.sorting = true;
+      	$timeout(function(){
+      		$scope.books.sorting = false;
+      	}, 500);
+      });
 
-	    $scope.books.editBookEntry = function(book){
-	    	// if modal alaready triggered and 
-        	if($scope.books.modalTriggered){
+      $scope.books.editBookEntry = function(book){
+      	// if modal alaready triggered and 
+      	if($scope.books.modalTriggered){
 
-        		var requestBody = setRequestBody();
-        		BooksService.updatePhoneBook($scope.modalData).then(function(response){
-        			$scope.modalData.entrySaved = true;
-        			onSuccessEntry(book);
-        		});
+      		var requestBody = setRequestBody();
+      		BooksService.updatePhoneBook($scope.modalData).then(function(response){
+      			$scope.modalData.entrySaved = true;
+      			onSuccessEntry(book);
+      		});
 
-        	}else{
-        		// trigger ngDialog
-        		$scope.books.modalTriggered = true;
-        		$scope.modalData = book;
-        		$scope.oldBookValue = angular.copy(book);
-        		$scope.modalData.editing = true;
-        		$scope.modalData.modalTitle = "Edit Phonebook entry";
-        		$scope.createNewModal = ngDialog.open({ template: 'js/views/partials/_book_modal.html', scope: $scope });
+      	}else{
+      		// trigger ngDialog
+      		$scope.books.modalTriggered = true;
+      		$scope.modalData = book;
+      		$scope.oldBookValue = angular.copy(book);
+      		$scope.modalData.editing = true;
+      		$scope.modalData.modalTitle = "Edit Phonebook entry";
+      		$scope.createNewModal = ngDialog.open({ template: 'js/views/partials/_book_modal.html', scope: $scope });
 
-		        /* fetch close modal event and trigger 
-		        propper functoion to clear up data */
-		        $scope.closeModalPromise('createNewModal', book);
+          /* fetch close modal event and trigger 
+          propper functoion to clear up data */
+          $scope.closeModalPromise('createNewModal', book);
 
-        	}
-	    };
+      	}
+      };
 
-        $scope.books.createNew = function(){
+      $scope.books.createNew = function(){
         	
-        	// if modal alaready triggered and 
-        	if($scope.books.modalTriggered){
+      	// if modal alaready triggered and 
+      	if($scope.books.modalTriggered){
 
-        		var requestBody = setRequestBody();
-	        	BooksService.createNewBook(requestBody).then(function(response){
+      		var requestBody = setRequestBody();
+        	BooksService.createNewBook(requestBody).then(function(response){
 
-	        		$scope.modalData.entrySaved = true;
-	        		var book = response.data[response.data.length -1];
-	        		book.newlyAdded = true;
+        		$scope.modalData.entrySaved = true;
+        		var book = response.data[response.data.length -1];
+        		book.newlyAdded = true;
 
-	        		onSuccessEntry(book);
+        		onSuccessEntry(book);
 
-	        	});
+        	});
 
-        	}else{
+      	}else{
 
-        		// trigger ngDialog
-        		$scope.books.modalTriggered = true;
-        		$scope.modalData = { modalTitle : "Create new Phonebook entry", newBook : true}; 
-        		$scope.createNewModal = ngDialog.open({
-		            template: 'js/views/partials/_book_modal.html',
-		            scope: $scope
-		        });
+      		// trigger ngDialog
+      		$scope.books.modalTriggered = true;
+      		$scope.modalData = { modalTitle : "Create new Phonebook entry", newBook : true}; 
+      		$scope.createNewModal = ngDialog.open({
+              template: 'js/views/partials/_book_modal.html',
+              scope: $scope
+          });
 
-		        /* fetch close modal event and trigger 
-		        propper functoion to clear up data */
-		        $scope.closeModalPromise('createNewModal');
+          /* fetch close modal event and trigger 
+          propper functoion to clear up data */
+          $scope.closeModalPromise('createNewModal');
 
-        	}
-       	};
+      	}
+     	};
 
-       	$scope.books.closeDialog = function(book){
-       		ngDialog.close();
-       	};
+     	$scope.books.closeDialog = function(book){
+     		ngDialog.close();
+     	};
 
-       	$scope.books.deleteBookEntry = function(book){
-       		if(book.confirmDelete){
-       			BooksService.removeBook(book._id).then(function(){
-       				book.confirmedDelete = true;
-       				$timeout(function(){ $scope.books.all.splice($scope.books.all.indexOf(book), 1); },1000);
-       			});
-       		}else{
-       			book.confirmDelete = true;
-       			$timeout(function(){
-       				book.confirmDelete = false;
-       			}, 5000);
-       		}
-       	};
+     	$scope.books.deleteBookEntry = function(book){
+     		if(book.confirmDelete){
+     			BooksService.removeBook(book._id).then(function(){
+     				book.confirmedDelete = true;
+     				$timeout(function(){ $scope.books.all.splice($scope.books.all.indexOf(book), 1); },1000);
+     			});
+     		}else{
+     			book.confirmDelete = true;
+     			$timeout(function(){
+     				book.confirmDelete = false;
+     			}, 5000);
+     		}
+     	};
 
-       	function setRequestBody(){
-	    	return {
-        		firstName: $scope.modalData.firstName,
-        		lastName: $scope.modalData.lastName,
-        		phoneNumber: $scope.modalData.phoneNumber
-        	};
-	    }
+      $scope.logout = function(){
+        LoginService.logout();
+        $state.go('login');
+      };
 
-	    function onSuccessEntry(book){
-			$timeout(function(){
+      function setRequestBody(){
+      	return {
+      		firstName: $scope.modalData.firstName,
+      		lastName: $scope.modalData.lastName,
+      		phoneNumber: $scope.modalData.phoneNumber
+      	};
+      }
+
+      function onSuccessEntry(book){
+  		 $timeout(function(){
     			$scope.books.closeDialog();
     			if(book.newlyAdded) { $scope.books.all.push(book); }else { book.edited = true; }
     		}, 2000);
-	    }
-
+      }
 
     }
 ]);
 
+App
+.directive('onEnter', function () {
+  return {
+      restrict: 'A',
+      scope: { onEnter: '&' },
+      link: function (scope, elements, attrs) {
+        elements.on('keydown keypress', function (e) {
+          if (e.which === 13) {
+            scope.$apply(function () {
+                scope.$eval(scope.onEnter);
+            });
+            e.preventDefault();
+          }
+        });
+      }
+    };
+});
 /*global App: true, angular:true */
 App
     .config([
@@ -31467,24 +31531,20 @@ App
                         getBooks: function(BooksService){
                             return BooksService.getBooks();
                         }
-                    }
+                    },
+                    authenticate: true
                 });
-                // .state('location.instance', {
-                //     url: ':locationId',
-                //     views: {
-                //         'instance': {
-                //             templateUrl: 'js/views/location_instance.html',
-                //             controller: 'LocationInstanceController'
-                //         }
-                //     },
-                //     resolve: {
-                //         getLocationInstance: function($stateParams, LocationService) {
-                //             return LocationService.getLocations($stateParams.locationId);
-                //         }
-                //     }
-                // });
         }
-    ]);
+    ])
+    .run(function($rootScope, $state, LoginService) {
+        $rootScope.$on('$stateChangeStart',
+          function(event, toState) {
+            if (toState.authenticate && !LoginService.isAuthenticated) {
+              $state.go('login');
+              event.preventDefault();
+            }
+          });
+      });
 /*global angular:true, is:true, console: true */
 App.service('BooksService', ['$http', '$q', '$location', 'conf', function($http, $q, $location, conf) {
     'use strict';
@@ -31520,8 +31580,56 @@ App.service('LoginService', ['$http', '$q', '$location', 'conf', function($http,
     'use strict';
 
     var login = {};
+    var LOCAL_TOKEN_KEY = 'tokenKey';
+  	var authToken;
 
-    
+  	login.isAuthenticated = false;
+ 
+	function loadUserCredentials() {
+		var token = window.localStorage.getItem(LOCAL_TOKEN_KEY);
+		if (token) {
+		  useCredentials(token);
+		}
+	}
+ 
+	function storeUserCredentials(token) {
+		window.localStorage.setItem(LOCAL_TOKEN_KEY, token);
+		useCredentials(token);
+	}
+	 
+	function useCredentials(token) {
+		login.isAuthenticated = true;
+		authToken = token;
+
+		// Set the token as header for your requests!
+		$http.defaults.headers.common.Authorization = authToken;
+	}
+
+	function destroyUserCredentials() {
+		authToken = undefined;
+		login.isAuthenticated = false;
+		$http.defaults.headers.common.Authorization = undefined;
+		window.localStorage.removeItem(LOCAL_TOKEN_KEY);
+	}
+
+	login.doLogin = function(user) {
+
+	  var def = $q.defer();
+	  $http.post(conf.apiRoot + conf.auth, user).then(function(result) {
+	      storeUserCredentials(result.data.token);
+	      def.resolve(result.data);
+	  }, function(error){
+	  	def.reject(error.data);
+	  });
+	  return def.promise;
+
+	};
+
+	login.logout = function() {
+		destroyUserCredentials();
+	};
+
+	loadUserCredentials();
 
     return login;
 }]);

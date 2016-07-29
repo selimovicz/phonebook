@@ -21,21 +21,17 @@ App
                         getBooks: function(BooksService){
                             return BooksService.getBooks();
                         }
-                    }
+                    },
+                    authenticate: true
                 });
-                // .state('location.instance', {
-                //     url: ':locationId',
-                //     views: {
-                //         'instance': {
-                //             templateUrl: 'js/views/location_instance.html',
-                //             controller: 'LocationInstanceController'
-                //         }
-                //     },
-                //     resolve: {
-                //         getLocationInstance: function($stateParams, LocationService) {
-                //             return LocationService.getLocations($stateParams.locationId);
-                //         }
-                //     }
-                // });
         }
-    ]);
+    ])
+    .run(function($rootScope, $state, LoginService) {
+        $rootScope.$on('$stateChangeStart',
+          function(event, toState) {
+            if (toState.authenticate && !LoginService.isAuthenticated) {
+              $state.go('login');
+              event.preventDefault();
+            }
+          });
+      });

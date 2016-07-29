@@ -14,16 +14,18 @@
                     <div class="row field">
                         <label class="col-md-4 control-label"> Email</label>
                         <div class="col-md-4">
-                            <input class="form-control animated" autofocus ng-model="email" placeholder="Email"/>
+                            <input class="form-control animated" ng-change="clearError()" on-enter="doLogin()" autofocus ng-model="user.email" placeholder="Email"  ng-class="{'shake errored' : error.cause == 'email'}"/>
                         </div>
                     </div>
 
                     <div class="row field">
                         <label class="col-md-4 control-label"> Password</label>
                         <div class="col-md-4">
-                            <input class="form-control animated" ng-model="password" placeholder="Password"/>
-                            <br/><br/>
-                            <button type="button" class="btn btn-default login pull-right" ng-click="doLogin()" ng-disabled="!(email && password)"> Login</button>
+                            <input class="form-control animated" type="password"  ng-change="clearError()" on-enter="doLogin()" ng-model="user.password" placeholder="Password" ng-class="{'shake errored' : error.cause == 'password'}"/>
+                            <br/>
+                            <div class="alert alert-danger" role="alert" ng-if="error.is">{{error.message}}</div>
+                            <br/>
+                            <button type="button" class="btn btn-default login pull-right" ng-click="doLogin()" ng-disabled="!(user.email && user.password)"> Login</button>
                         </div>
                     </div>
 
