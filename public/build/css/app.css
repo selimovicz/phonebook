@@ -11571,9 +11571,10 @@ body {
 button,
 a {
   outline: none;
+  box-shadow: none !important;
 }
 #phonebook {
-  padding-top: 80px;
+  padding-top: 100px;
 }
 #phonebook .phone-header button {
   padding: 5px 11px;
@@ -11603,16 +11604,18 @@ a {
   height: 28px;
   outline: none !important;
   box-shadow: none !important;
-  border: 1px solid #4E5D6C;
+  border: 1px solid #9ba5af;
 }
 #phonebook .phone-table {
-  margin-top: 30px;
+  margin-top: 50px;
 }
 #phonebook .phone-table a {
   color: #4E5D6C;
 }
 #phonebook .phone-table table .action-button {
   padding: 2px 4px 2px 5px;
+  outline: none !important;
+  box-shadow: none !important;
 }
 #phonebook .phone-table table .action-button.confirm {
   color: #fff;
@@ -11639,7 +11642,7 @@ a {
   padding: 0 10px;
   border: none;
   border-radius: 0;
-  border-bottom: 1px solid #bbb3b3;
+  border-bottom: 1px solid #bbb3b3 !important;
   color: #484848;
   box-shadow: none;
   margin-top: 3px;

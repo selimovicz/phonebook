@@ -31379,9 +31379,13 @@ App.controller('MasterController', [
 
           // restore old value if cancel edit
           if(book && $scope.modalData.editing && !$scope.modalData.entrySaved){
-          	book = $scope.oldBookValue;
+             BooksService.getBooks().then(function(response){
+              $scope.books.all = response.data;
+              $scope.modalData = {};
+            });
+          }else{
+            $scope.modalData = {};
           }
-          $scope.modalData = {};
         });
       };
 
@@ -31397,7 +31401,7 @@ App.controller('MasterController', [
       	if($scope.books.modalTriggered){
 
       		var requestBody = setRequestBody();
-      		BooksService.updatePhoneBook($scope.modalData).then(function(response){
+      		BooksService.updatePhoneBook($scope.modalData.book).then(function(response){
       			$scope.modalData.entrySaved = true;
       			onSuccessEntry(book);
       		});
@@ -31405,7 +31409,7 @@ App.controller('MasterController', [
       	}else{
       		// trigger ngDialog
       		$scope.books.modalTriggered = true;
-      		$scope.modalData = book;
+      		$scope.modalData = { book : book };
       		$scope.oldBookValue = angular.copy(book);
       		$scope.modalData.editing = true;
       		$scope.modalData.modalTitle = "Edit Phonebook entry";
@@ -31438,7 +31442,7 @@ App.controller('MasterController', [
 
       		// trigger ngDialog
       		$scope.books.modalTriggered = true;
-      		$scope.modalData = { modalTitle : "Create new Phonebook entry", newBook : true}; 
+      		$scope.modalData = { modalTitle : "Create new Phonebook entry", newBook : true, book: {} }; 
       		$scope.createNewModal = ngDialog.open({
               template: 'js/views/partials/_book_modal.html',
               scope: $scope
@@ -31482,9 +31486,9 @@ App.controller('MasterController', [
 
       function setRequestBody(){
       	return {
-      		firstName: $scope.modalData.firstName,
-      		lastName: $scope.modalData.lastName,
-      		phoneNumber: $scope.modalData.phoneNumber
+      		firstName: $scope.modalData.book.firstName,
+      		lastName: $scope.modalData.book.lastName,
+      		phoneNumber: $scope.modalData.book.phoneNumber
       	};
       }
 
