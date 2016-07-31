@@ -11612,6 +11612,9 @@ a {
 #phonebook .phone-table a {
   color: #4E5D6C;
 }
+#phonebook .phone-table table .editing {
+  background: #ebebeb;
+}
 #phonebook .phone-table table .action-button {
   padding: 2px 4px 2px 5px;
   outline: none !important;

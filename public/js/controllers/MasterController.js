@@ -69,8 +69,7 @@ App.controller('MasterController', [
       		// trigger ngDialog
       		$scope.books.modalTriggered = true;
       		$scope.modalData = { book : book };
-      		$scope.oldBookValue = angular.copy(book);
-      		$scope.modalData.editing = true;
+      		$scope.modalData.editing = book.editing = true;
       		$scope.modalData.modalTitle = "Edit Phonebook entry";
       		$scope.createNewModal = ngDialog.open({ template: 'js/views/partials/_book_modal.html', scope: $scope });
 

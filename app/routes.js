@@ -45,13 +45,13 @@ module.exports = function(app) {
 	});
 
 	// create dummy user
-	// curl -i -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:8080/api/setup
-	apiRoutes.get('/setup', function(req, res) {
+	// $ curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"email": "test01@test.com", "password": "test"}' http://localhost:8080/api/setup
+	apiRoutes.post('/setup', function(req, res) {
 
 	  // create a sample user
 	  var user = new User({ 
-	    email: 'zeid@gmail.com', 
-	    password: 'zeid'
+	    email: req.body.email,
+	    password: req.body.password,
 	  });
 
 	  // save the sample user

@@ -33,7 +33,7 @@
 	    				<th>Delete</th>
     				</tr>
 
-    				<tr class="animated" ng-repeat="book in books.all | orderBy: books.sortBy track by $index" ng-class="{'fadeOutLeft' : book.confirmedDelete, 'fadeInLeft': book.newlyAdded, 'pulse' : book.edited}">
+    				<tr class="animated" ng-repeat="book in books.all | orderBy: books.sortBy track by $index" ng-class="{'fadeOutLeft' : book.confirmedDelete, 'fadeInLeft': book.newlyAdded, 'editing' : book.editing}">
     					<td>{{book.firstName}}</td>
     					<td>{{book.lastName}}</td>
     					<td>{{book.phoneNumber}}</td>
