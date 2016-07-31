@@ -1,5 +1,5 @@
-App
-.directive('onEnter', function () {
+// simple directive which allows triggering function on enter event i.e. ng-enter="doSomething()"
+App.directive('onEnter', function () {
   return {
       restrict: 'A',
       scope: { onEnter: '&' },

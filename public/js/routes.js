@@ -7,6 +7,7 @@ App
 
             $urlRouterProvider.otherwise("/");
 
+            // setting up the routes
             $stateProvider
                 .state('login', {
                     url: '/',
@@ -26,6 +27,7 @@ App
                 });
         }
     ])
+    // preventing hitting routes which demand auth
     .run(function($rootScope, $state, LoginService) {
         $rootScope.$on('$stateChangeStart',
           function(event, toState) {

@@ -13,6 +13,7 @@ App.controller('MasterController', [
     function($scope, $log, $rootScope, $stateParams, $timeout, $state, getBooks, ngDialog, BooksService, LoginService) {
         'use strict';
 
+      // init books object
       $scope.books = {
       	all : getBooks,
       	sortBy: 'firstName',
@@ -24,12 +25,13 @@ App.controller('MasterController', [
 
       $scope.books.createNew = function(){
           
-        // if modal alaready triggered and 
+        // if modal alaready triggered and save entry clicked
         if($scope.books.modalTriggered){
 
           var requestBody = setRequestBody();
           BooksService.createNewBook(requestBody).then(function(response){
 
+            // callback if success phonebook entry
             $scope.modalData.entrySaved = true;
             var book = response.data[response.data.length -1];
             book.newlyAdded = true;
@@ -49,17 +51,19 @@ App.controller('MasterController', [
           });
 
           /* fetch close modal event and trigger 
-          propper functoion to clear up data */
+          propper function to clear up data */
           $scope.closeModalPromise('createNewModal');
 
         }
       };
 
       $scope.books.editBookEntry = function(book){
-      	// if modal alaready triggered and 
+      	// if modal alaready triggered and save entry clicked
       	if($scope.books.modalTriggered){
 
       		var requestBody = setRequestBody();
+
+          // updating phonebook entry
       		BooksService.updatePhoneBook($scope.modalData.book).then(function(response){
       			$scope.modalData.entrySaved = true;
       			onSuccessEntry(book);
@@ -80,6 +84,8 @@ App.controller('MasterController', [
       	}
       };
 
+
+      // delete phonebook function, along with delete confirmation
      	$scope.books.deleteBookEntry = function(book){
      		if(book.confirmDelete){
      			BooksService.removeBook(book._id).then(function(){
@@ -99,6 +105,8 @@ App.controller('MasterController', [
         $state.go('login');
       };
 
+
+      // on cancel click button in modal
       $scope.books.closeDialog = function(book){
         ngDialog.close();
       };
@@ -109,6 +117,7 @@ App.controller('MasterController', [
         });
       };
 
+      // fetching close modal event and executes appropriate callback function
       $scope.closeModalPromise = function(modalName, book) {
         $scope[modalName].closePromise.then(data => {
           
@@ -123,6 +132,7 @@ App.controller('MasterController', [
         });
       };
 
+      // whatching changes on books.sortBy scope variable
       $scope.$watch('books.sortBy', function(){
         $scope.books.sorting = true;
         $timeout(function(){
@@ -130,6 +140,7 @@ App.controller('MasterController', [
         }, 500);
       });
 
+      // simple function which prepares POST body object
       function setRequestBody(){
       	return {
       		firstName: $scope.modalData.book.firstName,
@@ -138,6 +149,7 @@ App.controller('MasterController', [
       	};
       }
 
+      // callback function if successful book entry
       function onSuccessEntry(book){
   		 $timeout(function(){
     			$scope.books.closeDialog();

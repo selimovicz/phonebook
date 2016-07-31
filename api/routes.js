@@ -1,7 +1,6 @@
 var Book = require('./models/book');
 var User = require('./models/user'); 
-
-var jwt    = require('jsonwebtoken');
+var jwt      = require('jsonwebtoken');
 var express  = require('express');
 
 module.exports = function(app) {
@@ -18,25 +17,28 @@ module.exports = function(app) {
 
 	    if (err) throw err;
 	    if (!user) {
-	      res.status(401).send({ success: false, message: 'Authentication failed. User not found.', cause: 'email' });
+
+	      // if user/email not found - throw error
+	      res.status(401).send({ success: false, message: 'Authentication failed. Email not found.', cause: 'email' });
 	    } else if (user) {
+
 	      // check if password matches
 	      if (user.password != req.body.password) {
 	        res.status(401).send({ success: false, message: 'Authentication failed. Wrong password.', cause: 'password'});
 	      } else {
 
-	        // if user is found and password is right
-	        // create a token
+	        // if email and pass - create token
 	        var token = jwt.sign(user, app.get('superSecret'), {
 	          expiresIn: 1440*3600 // expires in 24 hours
 	        });
 
-	        // return the information including token as JSON
+	        // return token with success flag - true
 	        res.json({
 	          success: true,
 	          message: 'Here is your token!',
 	          token: token
 	        });
+
 	      }   
 
 	    }
@@ -64,27 +66,25 @@ module.exports = function(app) {
 
 	apiRoutes.use(function(req, res, next) {
 
-	  // check header or url parameters or post parameters for token
+	  // check header for or body/url paramaters for header
 	  var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-	  // decode token
 	  if (token) {
 
-	    // verifies secret and checks exp
+	    // verify token and decode
 	    jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
 	      if (err) {
 	        return res.json({ success: false, message: 'Failed to authenticate token.' });    
 	      } else {
-	        // if everything is good, save to request for use in other routes
-	        req.decoded = decoded;    
+	      	// save to request for use in other routes
+	        req.decoded = decoded;
 	        next();
 	      }
 	    });
 
 	  } else {
 
-	    // if there is no token
-	    // return an error
+	    // no token - error
 	    return res.status(403).send({ 
 	        success: false, 
 	        message: 'No token provided.' 
@@ -116,7 +116,7 @@ module.exports = function(app) {
 	 		_id : req.params.id
 	 	}, function(err, books) {
 
-			// if there is an error retrieving, send the error. nothing after res.send(err) will execute
+			// if there is an error retrieving, send the error
 			if (err)
 				res.send(err);
 			res.json(books); // return all books in JSON format
@@ -126,7 +126,7 @@ module.exports = function(app) {
 	// create entry and send back all books after creation
 	apiRoutes.post('/books', function(req, res) {
 
-		// create a book, information comes from AJAX request from Angular
+		// create a book using body parameters
 		Book.create({
 			firstName : req.body.firstName,
 			lastName : req.body.lastName,
@@ -181,9 +181,8 @@ module.exports = function(app) {
 
 	app.use('/api', apiRoutes);
 
-
-	// apiRouteslication -------------------------------------------------------------
+	// load frontend on every *
 	app.get('*', function(req, res) {
-		res.sendfile('./public/app.html'); // load the single view file (angular will handle the page changes on the front-end)
+		res.sendfile('./public/app.html');
 	});
 };

@@ -18,7 +18,11 @@ App.controller('LoginController', [
 	        if(!emailRegex.test($scope.user.email)) {
 	          $scope.error = { is : true, message: "Email is not valid.", cause: 'email' };
 	        }else{
+
+                // if email reg pass - doLogin
 	        	LoginService.doLogin($scope.user).then(function(response){
+
+                    // if logged in - redirect user to /books page
 	        		$state.go('books');
 	        	}, function(error){
 	        		$scope.error = { is : true, message: error.message, cause: error.cause };
@@ -26,10 +30,10 @@ App.controller('LoginController', [
 	        }
         };
 
-        if(LoginService.isAuthenticated) {
-        	$state.go('books');
-        }
+        // if auth user visits / page, redirect to /books
+        if(LoginService.isAuthenticated) { $state.go('books'); }
 
+        // ng change function to clear out errors
         $scope.clearError = function(){
         	$scope.error = {};
         };

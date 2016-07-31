@@ -12,8 +12,37 @@ body {
 }
 button, a {
     outline: none;
-    box-shadow: none !important; 
 }
+
+.navbar {
+    border: none;
+    font-size: 12px;
+    height: 30px;
+    &-default {
+        border-bottom: 3px solid #03BDED;
+        .navbar-nav {
+            & > li> a {
+                color: #dfdfdf;
+                font-weight: 400;
+                &:hover{
+                    color: #fff;
+                }
+            }
+        }
+        background-color: #4E5D6C;
+        color: #fff;
+    }
+    h4{
+        margin: 14px 17px;
+        font-weight: 300;
+    }
+    i{
+        font-size: 20px;
+        padding-top: 14px;
+        cursor: pointer;
+    }
+}
+
 #phonebook {
     padding-top: 100px;
     .phone-header{
@@ -160,34 +189,5 @@ button, a {
                 }
             }
         }
-    }
-}
-
-.navbar {
-    border: none;
-    font-size: 12px;
-    height: 30px;
-    &-default {
-        border-bottom: 3px solid #03BDED;
-        .navbar-nav {
-            & > li> a {
-                color: #dfdfdf;
-                font-weight: 400;
-                &:hover{
-                    color: #fff;
-                }
-            }
-        }
-        background-color: #4E5D6C;
-        color: #fff;
-    }
-    h4{
-        margin: 14px 17px;
-        font-weight: 300;
-    }
-    i{
-        font-size: 20px;
-        padding-top: 14px;
-        cursor: pointer;
     }
 }
