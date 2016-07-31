@@ -16,7 +16,7 @@ To test authentication and to be able to access application in general, please h
 which will create user with credentials which you can use to login (note that you need to have application up and running).
 
 ```
-curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"email": "test01@test.com", "password": "test"}' http://localhost:8080/api/setup
+curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"email": "test01@test.com", "password": "test123"}' http://localhost:8080/api/setup
 ```
 
 
