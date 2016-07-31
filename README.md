@@ -6,8 +6,9 @@ To run it, you have to do few simple steps:
 ```
 1. npm install
 2. bower install
-3. grunt (build up all required files and run server on 8080 port)
-4. go to: http://localhost:8080/#/
+3. mongod (start mongoDB proccess)
+4. grunt (build up all required files and run server on 8080 port)
+5. go to: http://localhost:8080/#/
 
 ```
 
