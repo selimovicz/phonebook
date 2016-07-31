@@ -96,7 +96,7 @@ module.exports = function(app) {
 	// get all books
 	apiRoutes.get('/books', function(req, res) {
 
-		// use mongoose to get all locations in the database
+		// use mongoose to get all books in the database
 		Book.find(function(err, books) {
 
 			// if there is an error retrieving, send the error. nothing after res.send(err) will execute
@@ -109,7 +109,7 @@ module.exports = function(app) {
 	});
 
 
-	// get single location
+	// get single book
 	apiRoutes.get('/books/:id', function(req, res) {
 		// use mongoose to get single book in the database
 		Book.find({

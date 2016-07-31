@@ -5,12 +5,14 @@ App.service('BooksService', ['$http', '$q', '$location', 'conf', function($http,
     var books = {};
 
     books.getBooks = function() {
-        return $http.get(conf.apiRoot + conf.browseBooks)
+        var def = $q.defer();
+        $http.get(conf.apiRoot + conf.browseBooks)
             .success(function(response) {
-                return response.data;
-            }, function(response) {
-                return response.status;
+                def.resolve(response);
+            }, function(error) {
+                def.reject(response);
             });
+        return def.promise;
     };
 
     books.createNewBook = function(newBookEntry){

@@ -31365,7 +31365,7 @@ App.controller('MasterController', [
         'use strict';
 
       $scope.books = {
-      	all : getBooks.data,
+      	all : getBooks,
       	sortBy: 'firstName',
       	createNew: function(){},
       	editBookEntry: function(bookId){},
@@ -31373,28 +31373,38 @@ App.controller('MasterController', [
         sort: function(){}
       };
 
-      $scope.closeModalPromise = function(modalName, book) {
-        $scope[modalName].closePromise.then(data => {
-          $scope.books.modalTriggered = false;
+      $scope.books.createNew = function(){
+          
+        // if modal alaready triggered and 
+        if($scope.books.modalTriggered){
 
-          // restore old value if cancel edit
-          if(book && $scope.modalData.editing && !$scope.modalData.entrySaved){
-             BooksService.getBooks().then(function(response){
-              $scope.books.all = response.data;
-              $scope.modalData = {};
-            });
-          }else{
-            $scope.modalData = {};
-          }
-        });
+          var requestBody = setRequestBody();
+          BooksService.createNewBook(requestBody).then(function(response){
+
+            $scope.modalData.entrySaved = true;
+            var book = response.data[response.data.length -1];
+            book.newlyAdded = true;
+
+            onSuccessEntry(book);
+
+          });
+
+        }else{
+
+          // trigger ngDialog
+          $scope.books.modalTriggered = true;
+          $scope.modalData = { modalTitle : "Create new Phonebook entry", newBook : true, book: {} }; 
+          $scope.createNewModal = ngDialog.open({
+              template: 'js/views/partials/_book_modal.html',
+              scope: $scope
+          });
+
+          /* fetch close modal event and trigger 
+          propper functoion to clear up data */
+          $scope.closeModalPromise('createNewModal');
+
+        }
       };
-
-      $scope.$watch('books.sortBy', function(){
-      	$scope.books.sorting = true;
-      	$timeout(function(){
-      		$scope.books.sorting = false;
-      	}, 500);
-      });
 
       $scope.books.editBookEntry = function(book){
       	// if modal alaready triggered and 
@@ -31422,49 +31432,6 @@ App.controller('MasterController', [
       	}
       };
 
-      $scope.books.createNew = function(){
-        	
-      	// if modal alaready triggered and 
-      	if($scope.books.modalTriggered){
-
-      		var requestBody = setRequestBody();
-        	BooksService.createNewBook(requestBody).then(function(response){
-
-        		$scope.modalData.entrySaved = true;
-        		var book = response.data[response.data.length -1];
-        		book.newlyAdded = true;
-
-        		onSuccessEntry(book);
-
-        	});
-
-      	}else{
-
-      		// trigger ngDialog
-      		$scope.books.modalTriggered = true;
-      		$scope.modalData = { modalTitle : "Create new Phonebook entry", newBook : true, book: {} }; 
-      		$scope.createNewModal = ngDialog.open({
-              template: 'js/views/partials/_book_modal.html',
-              scope: $scope
-          });
-
-          /* fetch close modal event and trigger 
-          propper functoion to clear up data */
-          $scope.closeModalPromise('createNewModal');
-
-      	}
-     	};
-
-     	$scope.books.closeDialog = function(book){
-     		ngDialog.close();
-     	};
-
-      $scope.books.sort = function(){
-        BooksService.getBooks().then(function(response){
-          $scope.books.all = response.data;
-        });
-      };
-
      	$scope.books.deleteBookEntry = function(book){
      		if(book.confirmDelete){
      			BooksService.removeBook(book._id).then(function(){
@@ -31484,6 +31451,37 @@ App.controller('MasterController', [
         $state.go('login');
       };
 
+      $scope.books.closeDialog = function(book){
+        ngDialog.close();
+      };
+
+      $scope.books.sort = function(){
+        BooksService.getBooks().then(function(response){
+          $scope.books.all = response;
+        });
+      };
+
+      $scope.closeModalPromise = function(modalName, book) {
+        $scope[modalName].closePromise.then(data => {
+          
+          $scope.books.modalTriggered = false;
+          // restore old value if cancel edit
+          if(book && $scope.modalData.editing && !$scope.modalData.entrySaved){
+             BooksService.getBooks().then(function(response){
+              $scope.books.all = response;
+            });
+          }
+          $scope.modalData = {};
+        });
+      };
+
+      $scope.$watch('books.sortBy', function(){
+        $scope.books.sorting = true;
+        $timeout(function(){
+          $scope.books.sorting = false;
+        }, 500);
+      });
+
       function setRequestBody(){
       	return {
       		firstName: $scope.modalData.book.firstName,
@@ -31495,13 +31493,12 @@ App.controller('MasterController', [
       function onSuccessEntry(book){
   		 $timeout(function(){
     			$scope.books.closeDialog();
-    			if(book.newlyAdded) { $scope.books.all.push(book); }else { book.edited = true; }
+    			if(book.newlyAdded) { $scope.books.all.push(book); } else { book.edited = true; }
     		}, 2000);
       }
 
     }
 ]);
-
 App
 .directive('onEnter', function () {
   return {
@@ -31519,6 +31516,7 @@ App
       }
     };
 });
+
 /*global App: true, angular:true */
 App
     .config([
@@ -31563,12 +31561,14 @@ App.service('BooksService', ['$http', '$q', '$location', 'conf', function($http,
     var books = {};
 
     books.getBooks = function() {
-        return $http.get(conf.apiRoot + conf.browseBooks)
+        var def = $q.defer();
+        $http.get(conf.apiRoot + conf.browseBooks)
             .success(function(response) {
-                return response.data;
-            }, function(response) {
-                return response.status;
+                def.resolve(response);
+            }, function(error) {
+                def.reject(response);
             });
+        return def.promise;
     };
 
     books.createNewBook = function(newBookEntry){
